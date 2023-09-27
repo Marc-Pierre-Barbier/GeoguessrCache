@@ -1,0 +1,14 @@
+[
+  {
+    "id" : 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": { "regexSubstitution": "http://localhost:8080/" }
+    },
+    "condition": {
+      "regexFilter": "^https://streetviewpixels-pa\\.googleapis\\.com/",
+      "resourceTypes": ["main_frame", "image"]
+    }
+  }
+]
