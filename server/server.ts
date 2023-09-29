@@ -2,6 +2,7 @@ const cache: Record<string, Promise<{ data: Blob, headers: Headers }>> = {}
 import * as path from "path"
 import * as fs from "fs"
 import * as crypto from "crypto"
+import { heapStats } from "bun:jsc"
 
 const cache_dir = path.join(import.meta.dir, "cache")
 
@@ -25,6 +26,17 @@ Bun.serve({
 
 			const disk_path = path.join(cache_dir, url_tofilename(url) + ".jpg")
 			const disk_path_header = path.join(cache_dir, url_tofilename(url) + ".json")
+
+			console.log(heapStats().heapSize / 1024 / 1024)
+
+			if(heapStats().heapSize / 1024 / 1024 > 800) {
+				const all_urls = Object.keys(cache)
+				const urls_to_remove = all_urls.slice(0, all_urls.length / 2)
+				console.log("Wiping " + urls_to_remove.length / all_urls.length)
+				for(const url of urls_to_remove) {
+					delete cache[url]
+				}
+			}
 
 			//loading from disk
 			if(fs.existsSync(disk_path)) {
