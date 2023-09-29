@@ -16,23 +16,17 @@ Bun.serve({
 		const url = req.url
 
 		if(typeof cache[url] !== 'undefined') {
-			console.log("From cache: " + url)
 			const response = await cache[url]
 			return new Response(response.data, { headers: response.headers})
 		}
 
 		cache[url] = new Promise(async (res, rej) => {
-			console.log("caching: " + url)
-
 			const disk_path = path.join(cache_dir, url_tofilename(url) + ".jpg")
 			const disk_path_header = path.join(cache_dir, url_tofilename(url) + ".json")
-
-			console.log(heapStats().heapSize / 1024 / 1024)
 
 			if(heapStats().heapSize / 1024 / 1024 > 800) {
 				const all_urls = Object.keys(cache)
 				const urls_to_remove = all_urls.slice(0, all_urls.length / 2)
-				console.log("Wiping " + urls_to_remove.length / all_urls.length)
 				for(const url of urls_to_remove) {
 					delete cache[url]
 				}
@@ -40,7 +34,6 @@ Bun.serve({
 
 			//loading from disk
 			if(fs.existsSync(disk_path)) {
-				console.log("Loading from disk: " + url)
 				const data = await fs.promises.readFile(disk_path)
 				const headers = JSON.parse((await fs.promises.readFile(disk_path_header)).toString()) as Headers
 
